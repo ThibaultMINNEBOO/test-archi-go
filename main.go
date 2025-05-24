@@ -12,8 +12,8 @@ func main() {
 	mux := http.NewServeMux()
 
 	db := database.GetDatabase()
-	database.InitDatabase(db)
 	defer db.Close()
+	database.InitDatabase(db)
 	api.RegisterRoutes(mux)
 
 	log.Print("Listening...")

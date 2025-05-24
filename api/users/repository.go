@@ -6,12 +6,6 @@ import (
 	"github.com/ThibaultMINNEBOO/apigo/api/database"
 )
 
-type User struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
-	Age  int    `json:"age"`
-}
-
 func FindAllUsers(ch chan []User) {
 	db := database.GetDatabase()
 	defer db.Close()
@@ -34,4 +28,33 @@ func FindAllUsers(ch chan []User) {
 	}
 
 	ch <- users
+}
+
+func CreateUser(createUser CreateUserDTO, userChannel chan User) {
+	db := database.GetDatabase()
+	defer db.Close()
+
+	tx, _ := db.Begin()
+	stmt, err := tx.Prepare("INSERT INTO users (name, age) VALUES (?, ?)")
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	res, err := stmt.Exec(createUser.Name, createUser.Age)
+
+	if err != nil {
+		tx.Rollback()
+		fmt.Println(err)
+		return
+	}
+
+	lastInsertedId, _ := res.LastInsertId()
+
+	tx.Commit()
+
+	user := User{Id: int(lastInsertedId), Name: createUser.Name, Age: createUser.Age}
+
+	userChannel <- user
 }

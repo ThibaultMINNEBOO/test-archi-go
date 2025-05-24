@@ -19,9 +19,8 @@ func GetDatabase() *sql.DB {
 
 func InitDatabase(db *sql.DB) {
 	userTable := `
-	DROP TABLE users;
 	CREATE TABLE users (
-		id INTEGER NOT NULL PRIMARY KEY,
+		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 		name VARCHAR(100),
 		age INTEGER
 	);
@@ -30,6 +29,6 @@ func InitDatabase(db *sql.DB) {
 	_, err := db.Exec(userTable)
 
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 }
